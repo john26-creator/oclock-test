@@ -12,7 +12,7 @@ Lorsque je tape l'adresse : http://localhost/apprenant1/public/
 Lorsque je clique sur http://localhost/signin
 J'obtiens une erreur 404
 
-#Que faire
+# Que faire
 ## La feuille de style
 Les erreurs de type 404 signifie qu'une ressource n'est pas trouvé à l'endroit indiqué.
 par exemple ton fichier de vue ici header.tpl.php contient le liens suivant  
@@ -20,29 +20,47 @@ par exemple ton fichier de vue ici header.tpl.php contient le liens suivant
     <link rel="stylesheet" href="./css/style.css">
 
 ## Le Routage
-Maintenant tu as un probleme de routage et de redirection
-cela vient de ta variable $match qui contient les routes celle-ci est de type booleen et ne peut donc contenir tes routes.
-En fait la valeur est FALSE en regardant la documentation de la librairie cela signifie qu'il ne trouve pas la route en question.
+
+### La cause
+cela vient de ta variable $match d'index.php qui contient les routes à la valeur FALSE. Cela signifie qu'il ne trouve pas la route en question.
 La question est pourquoi ?
 Parceque tes routes enregistrées sont :
 /public /teachers /students/list /teachers/add /students/add /signin /logout /403 /404 /appusers
 mais les requetes envoyées sont prefixes par /apprenant1 et suffixe par un / exemple /apprenant1/public/
 Il faut donc:
-1/ Il faut donc rediriger toutes le requetes sur index.php qui sert de front controller et qui va recuperer les requetes et deleguer le traitement au controllers
-2/ Il faut faire le menage dans la requete pourque celle-ci soit interpretée correctement par index.php
+1/ Rediriger toutes le requetes sur index.php qui sert de front controller et qui va recuperer les requetes et deleguer le traitement au controllers
+2/ Faire le menage dans la requete pourque celle-ci soit interpretée correctement par index.php
 
+### Solution
+j'ai donc ajouté le .htaccess pour 
+1/ Rediriger toutes les requêtes sur index.php qui sert de front controller et qui va récupérer les requêtes et déléguer le traitement au controllers
+2/ Faire le ménage dans la requête pourque celle-ci soit interprétée correctement par index.php
 Pour cela il te manque un fichier .htaccess. Oui, il ne sert pas uniquement a restreindre l'accès a des ressources tu peux aussi l'utiliser les 
 RewriteEngine On
 
-## Point 1
-rediriger TOUTES les requêtes vers index.php et donner un URL relative URL dans "_url" GET param
+#### Point 1
+Rediriger TOUTES les requêtes vers index.php et donner un URL relative URL dans "_url" GET param
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-rediriger TOUTES les requêtes qui mène au dossier dans lequel se trouve le .htaccess vers index.php appeler /products => index.php?_url=/product
+Rediriger TOUTES les requêtes qui mène au dossier dans lequel se trouve le .htaccess vers index.php appeler /products => index.php?_url=/product
 RewriteRule ^(.*)$ index.php [QSA,L]
 
-## Point 2
+#### Point 2
 dynamically setup base URI
 RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
 RewriteRule ^(.*) - [E=BASE_URI:%1]
+
+# Les bons points
+Ton code est assez complet, tu utilises l'heritage pour tes controllers
+Tu encrypte tes mots de passes avec un algorithme asymetriques
+
+# Les ameliorations
+Tu peux faire encore mieux en :
+Découplant ton code. Sache que dans l’idéal qu'une classe ne doit avoir qu’une seule responsabilité. Ainsi dans ont index.php tu pourrais déléguer la création des routes
+Dans ton controller CoreController tu peux ajouter d'autre fonctionnalités communes, comme la gestion des token csrf, la gestion des redirections vers la page d'accueil ou de login lorsqu'un utilisateur n'a pas le rôle nécessaire.
+Si tu veux aller plus loin tu peux ajouter le blocage des login après plusieurs tentatives infructueuses ou ajouter un captcha, tu peux aussi ajouter le renouvellement du mot de passe.
+
+# Conclusion
+Dans l'ensemble c'est un bon travail, continues.
+
