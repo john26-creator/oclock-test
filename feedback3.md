@@ -65,3 +65,6 @@ Pour la session il faut utiliser session_start () en tout début de fichier ensu
 Pour la supprimer il faudra demander au controller de faire un session_destroy();. Ton navigateur conservera en l'id de session mais il ne sera plus référencé cote serveur.
 Pour le login : Il faut que les utilisateurs aient un mot de passe chiffré avec un algorithme asymétrique tu type bcrypt ou sha512. Pour vérifier que ton utilisateur a le bon mot de passe
 
+# Conclusion
+Il y a des choses à consolider mais tu tiens le bon bout.
+
